@@ -1,0 +1,33 @@
+# Ignorer les dépendances dans les répertoires frontend et backend
+/front/node_modules
+/back/node_modules
+
+# Ignorer les fichiers de configuration spécifiques à Yarn PnP
+/front/.pnp
+/front/.pnp.js
+/back/.pnp
+/back/.pnp.js
+
+# Ignorer les résultats de test
+/front/coverage
+/back/coverage
+
+# Ignorer les builds de production
+/front/build
+/back/build
+
+# Ignorer les fichiers divers
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignorer les logs de débogage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorer les fichiers spécifiques à l'éditeur ou au système
+.vscode/
+.idea/
