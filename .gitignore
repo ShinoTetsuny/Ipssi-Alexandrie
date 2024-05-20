@@ -31,3 +31,4 @@ yarn-error.log*
 # Ignorer les fichiers spécifiques à l'éditeur ou au système
 .vscode/
 .idea/
+.env
