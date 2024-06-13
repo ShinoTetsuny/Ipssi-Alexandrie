@@ -10,7 +10,10 @@ exports.createUser = async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
       email: req.body.email,
-      password: hashedPassword
+      password: hashedPassword,
+      role: req.body.role,
+      stockageLeft: req.body.stockageTotal,
+      stockageTotal: req.body.stockageTotal,
     });
     const result = await user.save();
     res.status(200).json(result);

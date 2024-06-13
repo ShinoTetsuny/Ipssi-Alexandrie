@@ -5,12 +5,15 @@ const User = require('../models/user');
 exports.register = async (req, res, next) => {
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
       const user = new User({
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         email: req.body.email,
         phone: req.body.phone,
-        password: hashedPassword
+        password: hashedPassword,
+        role: ['USER'],
+        stockageTotal: 1000000000,
       });
       const result = await user.save();
       res.status(200).json(result);
@@ -23,7 +26,7 @@ exports.register = async (req, res, next) => {
     try {
       const user = await User.findOne({ email: req.body.email });
       if (user && await bcrypt.compare(req.body.password, user.password)) {
-        const token = jwt.sign({ _id: user._id }, 'secretKey');
+        const token = jwt.sign({ _id: user._id, role: user.role }, 'secretKey');
         res.status(200).json({ token });
       } else {
         throw new Error('Invalid email or password');
