@@ -20,10 +20,8 @@ const Login = () => {
             if (response.ok) {
                 const data = await response.json();
                 const token = data.token;
-                console.log("reponseOK")
                 setToken(token) // Le cookie expirera après 7 jours
                 // Connexion réussie, effectuez les actions nécessaires ici
-                console.log("afterToken")
                 navigate('/home'); // Redirige vers la page d'accueil
             } else {
                 // Gestion des erreurs de connexion ici

@@ -9,7 +9,6 @@ export const getToken = () => {
 
 export const setToken = (token) => {
     Cookies.set('Alexandrie', token, { expires: 7 });
-    console.log("setToken");
 };
 
 export const removeToken = () => {
@@ -17,16 +16,11 @@ export const removeToken = () => {
 };
 
 export const isAuthenticated = () => {
-    console.log(typeof SECRET_KEY); // Should log 'string'
-    console.log("isAuthenticated");
     const token = getToken();
-    console.log(token);
     if (!token) return false;
 
     try {
-        console.log("try");
         const decoded = jwt.verify(token, SECRET_KEY);
-        console.log("qsdqsdqdqdsqd",decoded); // Log the decoded token
         return true;
     } catch (error) {
         console.log("catch");
@@ -48,5 +42,21 @@ export const hasRole = (roles) => {
     } catch (error) {
         console.log(error); // Log the error
         return false;
+    }
+};
+
+export const getUserId = () => {
+    const token = getToken();
+    if (!token) return null;
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        if (decoded && decoded._id) {
+            return decoded._id;
+        }
+        return null;
+    } catch (error) {
+        console.log(error); // Log the error
+        return null;
     }
 };

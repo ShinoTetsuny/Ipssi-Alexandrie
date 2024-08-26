@@ -19,7 +19,16 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
+        {/* Utilisater */}
         <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
+
+        {/* Admin */}
+        <Route path="/backOffice" element={<ProtectedRoute element={<Home />} />} />
+        <Route path="/backOffice/users" element={<ProtectedRoute element={<Home />} />} />
+        <Route path="/backOffice/books" element={<ProtectedRoute element={<Home />} />} />
+
+
+        {/* Tout le Monde  */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
