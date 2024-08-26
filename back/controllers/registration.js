@@ -19,6 +19,8 @@ exports.register = async (req, res, next) => {
     });
     const result = await user.save();
 
+    const token = jwt.sign({ _id: result._id, role: result.role }, process.env.JWT_SECRET); 
+
     // Configuration du transporteur Nodemailer
     const transporter = nodemailer.createTransport({
       service: 'Gmail', // ou un autre service comme 'Outlook', 'Yahoo', etc.
@@ -43,7 +45,7 @@ exports.register = async (req, res, next) => {
       }
     });
 
-    res.status(200).json(result);
+    res.status(200).json({ token });
   } catch (error) {
     res.status(400).json({ error, req: req.body });
   }
@@ -53,7 +55,7 @@ exports.login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user && await bcrypt.compare(req.body.password, user.password)) {
-      const token = jwt.sign({ _id: user._id, role: user.role }, 'secretKey');
+      const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET);
       res.status(200).json({ token });
     } else {
       throw new Error('Email ou mot de passe invalide');

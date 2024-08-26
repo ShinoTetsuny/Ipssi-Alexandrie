@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'secretKey';
+const SECRET_KEY = '123456789';
 
 export const getToken = () => {
     return Cookies.get('Alexandrie');
