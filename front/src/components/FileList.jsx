@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Document, Page } from 'react-pdf';
 
-// Example URL for the backend API
 const API_URL = 'http://localhost:3000/files';
 
 const FileList = ({ clientId }) => {
@@ -15,19 +15,18 @@ const FileList = ({ clientId }) => {
   });
 
   useEffect(() => {
-    // Fetch files from the backend when the component mounts
     const fetchFiles = async () => {
       try {
         let url = API_URL;
         if (clientId) {
           url += `/client/${clientId}`;
-        }else{
-            url += `/`;
+        } else {
+          url += `/`;
         }
 
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data); // Add this line to see the structure of the data
+        console.log(data);
         setFiles(Array.isArray(data) ? data : []);
         setFilteredFiles(Array.isArray(data) ? data : []);
       } catch (error) {
@@ -36,7 +35,7 @@ const FileList = ({ clientId }) => {
         setFilteredFiles([]);
       }
     };
-  
+
     fetchFiles();
   }, [clientId]);
 
@@ -87,6 +86,13 @@ const FileList = ({ clientId }) => {
 
     applyFilters();
   }, [filters, files, clientId]);
+
+  const getFilePreviewUrl = (file) => {
+    return `${API_URL}/${file._id}`;
+  };
+
+  const isImageFile = (extension) => ['jpg', 'jpeg', 'png', 'gif'].includes(extension.toLowerCase());
+  const isPdfFile = (extension) => extension.toLowerCase() === 'pdf';
 
   return (
     <div>
@@ -145,7 +151,7 @@ const FileList = ({ clientId }) => {
       </div>
 
       {filteredFiles.length === 0 ? (
-        <p>No files found.</p> 
+        <p>No files found.</p>
       ) : (
         <table>
           <thead>
@@ -154,6 +160,7 @@ const FileList = ({ clientId }) => {
               <th>Extension</th>
               <th>Weight (bytes)</th>
               <th>Created At</th>
+              <th>Preview</th>
               {!clientId && <th>Client ID</th>}
             </tr>
           </thead>
@@ -164,6 +171,23 @@ const FileList = ({ clientId }) => {
                 <td>{file.extension}</td>
                 <td>{file.weight}</td>
                 <td>{new Date(file.createdAt).toLocaleDateString()}</td>
+                <td>
+                  {isImageFile(file.extension) ? (
+                    <img
+                      src={getFilePreviewUrl(file)}
+                      alt={file.name}
+                      style={{ width: '100px', height: 'auto' }}
+                    />
+                  ) : isPdfFile(file.extension) ? (
+                    <div style={{ width: '100px' }}>
+                      <Document file={getFilePreviewUrl(file)}>
+                        <Page pageNumber={1} width={100} />
+                      </Document>
+                    </div>
+                  ) : (
+                    'No preview available'
+                  )}
+                </td>
                 {!clientId && <td>{file.client}</td>}
               </tr>
             ))}

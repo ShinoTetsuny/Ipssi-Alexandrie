@@ -18,6 +18,8 @@ const FileUpload = ({ onUploadSuccess, clientId }) => {
     const formData = new FormData();
     formData.append('client', clientId);
     formData.append('file', file);
+    console.log(formData);
+    
 
     try {
       const response = await fetch('http://localhost:3000/files/upload', {

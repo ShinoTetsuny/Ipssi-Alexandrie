@@ -74,7 +74,8 @@ const getAllFiles = async (req, res) => {
         weight: size,
         client: req.body.client,
       });
-  
+      console.log(file);
+      
       await file.save();
       res.status(201).json({ file, message: 'File uploaded successfully!' });
     } catch (error) {
