@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const fileSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true , unique: true},
   extension: { type: String, required: true },
   weight: { type: Number, required: true },
   client: { type: String, required: true },

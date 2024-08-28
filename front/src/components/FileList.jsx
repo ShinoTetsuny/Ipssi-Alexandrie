@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
+import 'react-pdf/dist/Page/TextLayer.css';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 const API_URL = 'http://localhost:3000/files';
 
-const FileList = ({ clientId }) => {
+const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [filters, setFilters] = useState({
@@ -13,6 +15,13 @@ const FileList = ({ clientId }) => {
     createdAt: '',
     clientId: '',
   });
+  const [toUpdate, setToUpdate] = useState(false);
+  const [file, setFile] = useState(null);
+  const [extensions, setExtensions] = useState([]);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -26,30 +35,27 @@ const FileList = ({ clientId }) => {
 
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data);
-        setFiles(Array.isArray(data) ? data : []);
-        setFilteredFiles(Array.isArray(data) ? data : []);
+        const filesArray = Array.isArray(data) ? data : [];
+        setFiles(filesArray);
+        setFilteredFiles(filesArray);
+
+        // Extract unique file extensions
+        const uniqueExtensions = [
+          ...new Set(filesArray.map((file) => file.extension.toLowerCase())),
+        ];
+        setExtensions(uniqueExtensions);
       } catch (error) {
         console.error('Failed to fetch files:', error);
         setFiles([]);
         setFilteredFiles([]);
       }
     };
-
     fetchFiles();
-  }, [clientId]);
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters({
-      ...filters,
-      [name]: value,
-    });
-  };
+  }, [clientId, toUpdate]);
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = files;
+      let filtered = [...files];
 
       if (filters.name) {
         filtered = filtered.filter((file) =>
@@ -58,21 +64,27 @@ const FileList = ({ clientId }) => {
       }
 
       if (filters.extension) {
-        filtered = filtered.filter((file) =>
-          file.extension.toLowerCase().includes(filters.extension.toLowerCase())
+        filtered = filtered.filter(
+          (file) => file.extension.toLowerCase() === filters.extension.toLowerCase()
         );
       }
 
       if (filters.weight) {
-        filtered = filtered.filter(
-          (file) => file.weight.toString().includes(filters.weight)
-        );
+        filtered = filtered.sort((a, b) => {
+          if (filters.weight === 'asc') return a.weight - b.weight;
+          if (filters.weight === 'desc') return b.weight - a.weight;
+          return 0;
+        });
       }
 
       if (filters.createdAt) {
-        filtered = filtered.filter((file) =>
-          new Date(file.createdAt).toISOString().includes(filters.createdAt)
-        );
+        filtered = filtered.sort((a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          if (filters.createdAt === 'asc') return dateA - dateB;
+          if (filters.createdAt === 'desc') return dateB - dateA;
+          return 0;
+        });
       }
 
       if (!clientId && filters.clientId) {
@@ -87,6 +99,98 @@ const FileList = ({ clientId }) => {
     applyFilters();
   }, [filters, files, clientId]);
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!clientId) {
+      alert('Client ID is required');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('client', clientId);
+    formData.append('file', file);
+    console.log(formData);
+
+    try {
+      const response = await fetch('http://localhost:3000/files/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        setToUpdate(!toUpdate);
+        if (onUploadSuccess) onUploadSuccess(result.file); // Callback on success
+      } else {
+        alert(result.error);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('File upload failed.');
+    }
+  };
+
+  const handleDelete = async (fileId) => {
+    try {
+      const response = await fetch(`${API_URL}/${fileId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove deleted file from local state
+        const newFiles = files.filter((file) => file._id !== fileId);
+        setToUpdate(!toUpdate);
+        if (onDeleteSuccess) onDeleteSuccess(file);
+        setFilteredFiles(newFiles.filter((file) =>
+          filters.name ? file.name.toLowerCase().includes(filters.name.toLowerCase()) : true &&
+          filters.extension ? file.extension.toLowerCase().includes(filters.extension.toLowerCase()) : true &&
+          filters.weight ? file.weight.toString().includes(filters.weight) : true &&
+          filters.createdAt ? new Date(file.createdAt).toISOString().includes(filters.createdAt) : true &&
+          !clientId && filters.clientId ? file.client.toLowerCase().includes(filters.clientId.toLowerCase()) : true
+        ));
+        alert('File deleted successfully');
+      } else {
+        console.error('Failed to delete file');
+        alert('Failed to delete file');
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+  };
+
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      const response = await fetch(`${API_URL}/${fileId}`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   const getFilePreviewUrl = (file) => {
     return `${API_URL}/${file._id}`;
   };
@@ -96,11 +200,27 @@ const FileList = ({ clientId }) => {
 
   return (
     <div>
-      <h1>File List</h1>
+      <h2>Télécharger un fichier vers le serveur</h2>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <div>
+          <label htmlFor="file">Choisissez un fichier:</label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            accept=".pdf,.txt,.doc,.docx,.jpg,.png"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+
+        <button type="submit">Envoyer</button>
+      </form>
+      <h2>Liste de fichier</h2>
 
       <div>
         <label>
-          Name:
+          Nom:
           <input
             type="text"
             name="name"
@@ -110,36 +230,39 @@ const FileList = ({ clientId }) => {
         </label>
         <label>
           Extension:
-          <input
-            type="text"
+          <select
             name="extension"
             value={filters.extension}
             onChange={handleFilterChange}
-          />
+          >
+            <option value="">All</option>
+            {extensions.map((ext) => (
+              <option key={ext} value={ext}>
+                {ext}
+              </option>
+            ))}
+          </select>
         </label>
         <label>
-          Weight (in bytes):
-          <input
-            type="text"
-            name="weight"
-            value={filters.weight}
-            onChange={handleFilterChange}
-          />
+          Taille :
+          <select name="weight" value={filters.weight} onChange={handleFilterChange}>
+            <option value="">Sans Ordre</option>
+            <option value="asc">Ascendant</option>
+            <option value="desc">Descendant</option>
+          </select>
         </label>
         <label>
-          Created At:
-          <input
-            type="text"
-            name="createdAt"
-            value={filters.createdAt}
-            onChange={handleFilterChange}
-            placeholder="YYYY-MM-DD"
-          />
+          Date de création :
+          <select name="createdAt" value={filters.createdAt} onChange={handleFilterChange}>
+            <option value="">Sans Ordre</option>
+            <option value="asc">Ascendant</option>
+            <option value="desc">Descendant</option>
+          </select>
         </label>
 
         {!clientId && (
           <label>
-            Client ID:
+            ID Client :
             <input
               type="text"
               name="clientId"
@@ -151,17 +274,18 @@ const FileList = ({ clientId }) => {
       </div>
 
       {filteredFiles.length === 0 ? (
-        <p>No files found.</p>
+        <p>Aucun fichier trouver.</p>
       ) : (
         <table>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Nom</th>
               <th>Extension</th>
-              <th>Weight (bytes)</th>
-              <th>Created At</th>
-              <th>Preview</th>
-              {!clientId && <th>Client ID</th>}
+              <th>Taille (bytes)</th>
+              <th>Date de création</th>
+              <th>Previsualisation</th>
+              {!clientId && <th>ID Client</th>}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -179,8 +303,9 @@ const FileList = ({ clientId }) => {
                       style={{ width: '100px', height: 'auto' }}
                     />
                   ) : isPdfFile(file.extension) ? (
-                    <div style={{ width: '100px' }}>
-                      <Document file={getFilePreviewUrl(file)}>
+                    <div style={{ width: '100px', height: '150px' }}>
+                      <Document 
+                        file={getFilePreviewUrl(file)}>
                         <Page pageNumber={1} width={100} />
                       </Document>
                     </div>
@@ -189,6 +314,10 @@ const FileList = ({ clientId }) => {
                   )}
                 </td>
                 {!clientId && <td>{file.client}</td>}
+                <td>
+                  <button onClick={() => handleDownload(file._id, file.name)}>Télécharger</button>
+                  <button onClick={() => handleDelete(file._id)}>Supprimer</button>
+                </td>
               </tr>
             ))}
           </tbody>

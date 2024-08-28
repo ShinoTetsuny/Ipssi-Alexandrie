@@ -11,11 +11,12 @@ exports.register = async (req, res, next) => {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       email: req.body.email,
+      address: req.body.address,
       phone: req.body.phone,
       password: hashedPassword,
       role: ['USER'],
-      stockageLeft: 1000000000,
-      stockageTotal: 1000000000,
+      stockageTotal: 21474836480,
+      stockageLeft: 21474836480,
     });
     const result = await user.save();
 

@@ -4,11 +4,12 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 import '../styles/RegistrationPaymentPage.css';
 import { useNavigate } from 'react-router-dom';
 import { setToken } from '../security/AuthService';
+import { generateInvoiceAndUpload } from '../facturation/facturation';
 
 // Clé publique Stripe
 const stripePromise = loadStripe('pk_test_51PsAzYP9TeSuUsuh03FRfwm9KuyYnpWs3WigexvUn82XwGo3pXF6QFh24xYvscsduDMVFItQxrRipA8Ws0BBgbN900lwZ8DeVC');
 
-const CheckoutForm = ({ firstname, surname, email, phoneNumber, password, setMessage }) => {
+const CheckoutForm = ({ firstname, surname, email, address, phoneNumber, password, setMessage }) => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const CheckoutForm = ({ firstname, surname, email, phoneNumber, password, setMes
           firstname,
           lastname: surname,
           email,
+          address: address,
           phone: phoneNumber,
           password
         }),
@@ -55,6 +57,11 @@ const CheckoutForm = ({ firstname, surname, email, phoneNumber, password, setMes
         const data = await registerResponse.json();
         const token = data.token;
         setToken(token)
+        console.log('Token:', token);
+        const userId = await fetch('http://localhost:3000/users/email/' + email).then((res) => res.json());
+        console.log('User ID:', userId);
+        await generateInvoiceAndUpload(firstname, surname, address, userId._id);
+        console.log('Invoice generated and uploaded');
         navigate('/home');
       } else {
         setMessage('Erreur lors de la registration après paiement.');
@@ -77,6 +84,7 @@ const RegistrationPaymentPage = () => {
   const [email, setEmail] = useState('');
   const [surname, setSurname] = useState('');
   const [firstname, setFirstname] = useState('');
+  const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -116,6 +124,9 @@ const RegistrationPaymentPage = () => {
             <label>Prénom:</label>
             <input type="text" value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
 
+            <label>Addresse:</label>
+            <input type="tel" value={address} onChange={(e) => setAddress(e.target.value)} required />
+
             <label>Numéro de téléphone:</label>
             <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
 
@@ -136,6 +147,7 @@ const RegistrationPaymentPage = () => {
             firstname={firstname}
             surname={surname}
             email={email}
+            address={address}
             phoneNumber={phoneNumber}
             password={password}
             setMessage={setMessage}

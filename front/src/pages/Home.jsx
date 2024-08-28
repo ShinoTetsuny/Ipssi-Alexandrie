@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { getToken, getUserId } from '../security/AuthService'; // Assurez-vous d'avoir getToken
-import FileUpload from '../components/FileUpload';
 import FileList from '../components/FileList';
+import Storage from '../components/Storage';
 
 const Home = () => {
     const [user, setUser] = useState(null);
     const handleUploadSuccess = (file) => {
         console.log('File uploaded successfully:', file);
+        // Perform additional actions, such as updating the file list or notifying the user
+      };
+    const handleDeleteSuccess = (file) => {
+        console.log('File deleted successfully:', file);
         // Perform additional actions, such as updating the file list or notifying the user
       };
 
@@ -43,11 +47,11 @@ const Home = () => {
             {user ? (
                 <div>
                     <h1>Vous êtes connecté</h1>
-                    <p>Nom: {user.name}</p>
+                    <p>Nom: {user.firstname} {user.lastname}</p>
                     <p>Email: {user.email}</p>
+                    <Storage totalStorage={user.stockageTotal}  remainingStorage={user.stockageLeft} />
                     {/* Ajoutez plus d'informations sur l'utilisateur ici */}
-                    <FileUpload clientId={user._id} onUploadSuccess={handleUploadSuccess} />
-                    <FileList clientId={user._id} />
+                    <FileList clientId={user._id} onUploadSuccess={handleUploadSuccess} onDeleteSuccess={handleDeleteSuccess}/>
                 </div>
             ) : (
                 <h1>Loading...</h1>

@@ -12,7 +12,15 @@ import Register from './pages/Register';
 import Unauthorized from './pages/Unauthorized';
 
 import process from 'process';
+
+import { pdfjs } from 'react-pdf';
+
 window.process = process;
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

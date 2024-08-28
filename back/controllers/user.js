@@ -41,6 +41,16 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getUserByEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+    if (!user) throw new Error('User not found');
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+};
+
 exports.updateUser = async (req, res) => {
   try {
     const user = await User.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true });
@@ -60,3 +70,34 @@ exports.deleteUser = async (req, res) => {
     res.status(400).json({ error });
   }
 };
+
+exports.isStorageAvailable = async (userId, weight) => {
+  try {
+    const user = await User.findOne({ _id: userId });
+    if (!user) throw new Error('User not found');
+    console.log('User found:', user);
+    console.log('Weight:', weight);
+    if (user.stockageLeft < weight) {
+      return false;
+    }
+    return true;
+  }
+  catch (error) {
+    console.error('Error checking user storage space:', error);
+  }
+}
+
+exports.updateStockageLeft = async (userId, weight) => {
+  try {
+    const user = await User.findOne({ _id: userId
+    });
+    if (!user) throw new Error('User not found');
+    console.log('User found:', user);
+    console.log('Weight:', weight);
+    user.stockageLeft -= weight;
+    await user.save();
+  }
+  catch (error) {
+    console.error('Error updating user storage space:', error);
+  }
+}
