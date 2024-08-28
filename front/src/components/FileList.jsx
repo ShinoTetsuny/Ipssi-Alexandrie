@@ -21,6 +21,8 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
   const [toUpdate, setToUpdate] = useState(false);
   const [file, setFile] = useState(null);
   const [extensions, setExtensions] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const token = getToken();
 
   const handleFileChange = (e) => {
@@ -221,6 +223,22 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
   const isImageFile = (extension) => ['jpg', 'jpeg', 'png', 'gif'].includes(extension.toLowerCase());
   const isPdfFile = (extension) => extension.toLowerCase() === 'pdf';
 
+  const openModal = (file) => {
+    setSelectedFile(file);
+    setShowModal(true);
+  };
+  
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedFile(null);
+  };
+  
+  const handleOutsideClick = (event) => {
+    if (event.target.className === 'modal') {
+      closeModal();
+    }
+  };
+
   return (
     <div className="file-list-container">
       {page === "HOME" && (
@@ -320,23 +338,23 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
                 <td>{file.extension}</td>
                 <td>{file.weight}</td>
                 <td>{new Date(file.createdAt).toLocaleDateString()}</td>
-                <td>
-                  {isImageFile(file.extension) ? (
-                    <img
-                      src={getFilePreviewUrl(file)}
-                      alt={file.name}
-                      style={{ width: '100px', height: 'auto' }}
-                    />
-                  ) : isPdfFile(file.extension) ? (
-                    <div style={{ width: '100px', height: '150px' }}>
-                      <Document 
-                        file={getFilePreviewUrl(file)}>
-                        <Page pageNumber={1} width={100} />
-                      </Document>
-                    </div>
-                  ) : (
-                    'No preview available'
-                  )}
+                <td onClick={() => openModal(file)}>
+                    {isImageFile(file.extension) ? (
+                        <img
+                        src={getFilePreviewUrl(file)}
+                        alt={file.name}
+                        style={{ width: '100px', height: 'auto' }}
+                        />
+                    ) : isPdfFile(file.extension) ? (
+                        <div style={{ width: '100px', height: '150px' }}>
+                        <Document 
+                            file={getFilePreviewUrl(file)}>
+                            <Page pageNumber={1} width={100} />
+                        </Document>
+                        </div>
+                    ) : (
+                        'No preview available'
+                    )}
                 </td>
                 {hasRole('ADMIN') && <td>{file.client}</td>}
                 <td>
@@ -348,6 +366,31 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
           </tbody>
         </table>
       )}
+        {showModal && selectedFile && (
+        <div className="modal" onClick={handleOutsideClick}>
+            <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+                &times;
+            </span>
+            {isImageFile(selectedFile.extension) ? (
+                <img
+                src={getFilePreviewUrl(selectedFile)}
+                alt={selectedFile.name}
+                style={{ width: '100%', height: 'auto' }}
+                />
+            ) : isPdfFile(selectedFile.extension) ? (
+                <div style={{ width: '100%', height: 'auto' }}>
+                <Document 
+                    file={getFilePreviewUrl(selectedFile)}>
+                    <Page pageNumber={1} width={600} />
+                </Document>
+                </div>
+            ) : (
+                'No preview available'
+            )}
+            </div>
+        </div>
+        )}
     </div>
   );
 };
