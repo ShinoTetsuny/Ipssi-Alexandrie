@@ -11,7 +11,7 @@ export async function generateInvoiceAndUpload(clientName, clientSurname, client
     // Invoice Information
     const date = new Date().toLocaleDateString();
     const designation = "Service de stockage de fichiers";
-    const unitPrice = 1;
+    const unitPrice = 0.8;
     const quantity = 20;
     const taxRate = 20;
     const priceWithoutTaxes = (unitPrice * quantity).toFixed(2);

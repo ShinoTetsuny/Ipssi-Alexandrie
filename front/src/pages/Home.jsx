@@ -51,7 +51,7 @@ const Home = () => {
                     <p>Email: {user.email}</p>
                     <Storage totalStorage={user.stockageTotal}  remainingStorage={user.stockageLeft} />
                     {/* Ajoutez plus d'informations sur l'utilisateur ici */}
-                    <FileList clientId={user._id} onUploadSuccess={handleUploadSuccess} onDeleteSuccess={handleDeleteSuccess}/>
+                    <FileList clientId={user._id} onUploadSuccess={handleUploadSuccess} onDeleteSuccess={handleDeleteSuccess} page='HOME'/>
                 </div>
             ) : (
                 <h1>Loading...</h1>

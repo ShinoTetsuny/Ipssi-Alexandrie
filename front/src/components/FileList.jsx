@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import { hasRole } from '../security/AuthService';
 
 const API_URL = 'http://localhost:3000/files';
 
-const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId }) => {
+const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [filters, setFilters] = useState({
@@ -200,22 +201,24 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId }) => {
 
   return (
     <div>
-      <h2>Télécharger un fichier vers le serveur</h2>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div>
-          <label htmlFor="file">Choisissez un fichier:</label>
-          <input
-            type="file"
-            id="file"
-            name="file"
-            accept=".pdf,.txt,.doc,.docx,.jpg,.png"
-            onChange={handleFileChange}
-            required
-          />
-        </div>
+        {page == "HOME" &&(
+            <div><h2>Télécharger un fichier vers le serveur</h2>
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
+                <div>
+                <label htmlFor="file">Choisissez un fichier:</label>
+                <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    accept=".pdf,.txt,.doc,.docx,.jpg,.png"
+                    onChange={handleFileChange}
+                    required
+                />
+                </div>
 
-        <button type="submit">Envoyer</button>
-      </form>
+                <button type="submit">Envoyer</button>
+            </form></div>
+        )}
       <h2>Liste de fichier</h2>
 
       <div>
@@ -260,7 +263,7 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId }) => {
           </select>
         </label>
 
-        {!clientId && (
+        {hasRole('ADMIN') && (
           <label>
             ID Client :
             <input
@@ -313,7 +316,7 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId }) => {
                     'No preview available'
                   )}
                 </td>
-                {!clientId && <td>{file.client}</td>}
+                {hasRole('ADMIN') && <td>{file.client}</td>}
                 <td>
                   <button onClick={() => handleDownload(file._id, file.name)}>Télécharger</button>
                   <button onClick={() => handleDelete(file._id)}>Supprimer</button>
