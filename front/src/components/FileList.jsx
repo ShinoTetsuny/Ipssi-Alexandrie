@@ -359,7 +359,7 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
                 {hasRole('ADMIN') && <td>{file.client}</td>}
                 <td>
                   <button onClick={() => handleDownload(file._id, file.name)}>Télécharger</button>
-                  <button onClick={() => handleDelete(file._id)}>Supprimer</button>
+                  <button onClick={() => handleDelete(file._id)} className='delete'>Supprimer</button>
                 </td>
               </tr>
             ))}
