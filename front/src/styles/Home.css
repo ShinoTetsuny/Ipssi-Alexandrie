@@ -1,0 +1,29 @@
+.home-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .home-container h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .home-container p {
+    color: #555;
+    margin: 5px 0;
+  }
+  
+  .user-info {
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .storage-info {
+    margin-top: 20px;
+  }
+  

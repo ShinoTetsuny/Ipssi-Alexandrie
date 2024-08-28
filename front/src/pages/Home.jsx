@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getToken, getUserId } from '../security/AuthService'; // Assurez-vous d'avoir getToken
 import FileList from '../components/FileList';
 import Storage from '../components/Storage';
+import '../styles/Home.css';
 
 const Home = () => {
     const [user, setUser] = useState(null);
@@ -23,7 +24,7 @@ const Home = () => {
                 const response = await fetch(`http://localhost:3000/users/${userId}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Inclut le token dans l'en-tête Authorization
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -43,19 +44,22 @@ const Home = () => {
     }, []); // Dépendances vide : exécute uniquement au montage du composant
 
     return (
-        <div>
-            {user ? (
-                <div>
-                    <h1>Vous êtes connecté</h1>
-                    <p>Nom: {user.firstname} {user.lastname}</p>
-                    <p>Email: {user.email}</p>
-                    <Storage totalStorage={user.stockageTotal}  remainingStorage={user.stockageLeft} />
-                    {/* Ajoutez plus d'informations sur l'utilisateur ici */}
-                    <FileList clientId={user._id} onUploadSuccess={handleUploadSuccess} onDeleteSuccess={handleDeleteSuccess} page='HOME'/>
-                </div>
-            ) : (
-                <h1>Loading...</h1>
-            )}
+        <div className="home-container">
+        {user ? (
+            <div>
+            <h1>Vous êtes connecté</h1>
+            <div className="user-info">
+                <p>Nom: {user.firstname} {user.lastname}</p>
+                <p>Email: {user.email}</p>
+            </div>
+            <div className="storage-info">
+                <Storage totalStorage={user.stockageTotal} remainingStorage={user.stockageLeft} />
+            </div>
+            <FileList clientId={user._id} onUploadSuccess={handleUploadSuccess} onDeleteSuccess={handleDeleteSuccess} page='HOME' />
+            </div>
+        ) : (
+            <h1>Loading...</h1>
+        )}
         </div>
     );
 };

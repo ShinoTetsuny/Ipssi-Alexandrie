@@ -3,6 +3,8 @@ import { Document, Page } from 'react-pdf';
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import { hasRole } from '../security/AuthService';
+import '../styles/components/FileList.css';
+import { getToken } from '../security/AuthService'; 
 
 const API_URL = 'http://localhost:3000/files';
 
@@ -19,6 +21,7 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
   const [toUpdate, setToUpdate] = useState(false);
   const [file, setFile] = useState(null);
   const [extensions, setExtensions] = useState([]);
+  const token = getToken();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -34,7 +37,14 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
           url += `/`;
         }
 
-        const response = await fetch(url);
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+          }
+        });
         const data = await response.json();
         const filesArray = Array.isArray(data) ? data : [];
         setFiles(filesArray);
@@ -125,6 +135,10 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
       const response = await fetch('http://localhost:3000/files/upload', {
         method: 'POST',
         body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+      }
       });
 
       const result = await response.json();
@@ -145,6 +159,10 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
     try {
       const response = await fetch(`${API_URL}/${fileId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+      }
       });
 
       if (response.ok) {
@@ -173,6 +191,10 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
     try {
       const response = await fetch(`${API_URL}/${fileId}`, {
         method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+      }
       });
 
       if (!response.ok) {
@@ -200,28 +222,28 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
   const isPdfFile = (extension) => extension.toLowerCase() === 'pdf';
 
   return (
-    <div>
-        {page == "HOME" &&(
-            <div><h2>Télécharger un fichier vers le serveur</h2>
-            <form onSubmit={handleSubmit} encType="multipart/form-data">
-                <div>
-                <label htmlFor="file">Choisissez un fichier:</label>
-                <input
-                    type="file"
-                    id="file"
-                    name="file"
-                    accept=".pdf,.txt,.doc,.docx,.jpg,.png"
-                    onChange={handleFileChange}
-                    required
-                />
-                </div>
-
-                <button type="submit">Envoyer</button>
-            </form></div>
-        )}
+    <div className="file-list-container">
+      {page === "HOME" && (
+        <div>
+          <h2>Télécharger un fichier vers le serveur</h2>
+          <form onSubmit={handleSubmit} encType="multipart/form-data" className="file-upload-form">
+            <div>
+              <label htmlFor="file">Choisissez un fichier:</label>
+              <input
+                type="file"
+                id="file"
+                name="file"
+                accept=".pdf,.txt,.doc,.docx,.jpg,.png"
+                onChange={handleFileChange}
+                required
+              />
+            </div>
+            <button type="submit">Envoyer</button>
+          </form>
+        </div>
+      )}
       <h2>Liste de fichier</h2>
-
-      <div>
+      <div className="file-filters">
         <label>
           Nom:
           <input
@@ -279,7 +301,7 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
       {filteredFiles.length === 0 ? (
         <p>Aucun fichier trouver.</p>
       ) : (
-        <table>
+        <table className="file-table">
           <thead>
             <tr>
               <th>Nom</th>

@@ -1,0 +1,115 @@
+.file-list-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .file-list-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .file-upload-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .file-upload-form input[type="file"] {
+    flex: 1;
+  }
+  
+  .file-upload-form button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .file-upload-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  .file-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .file-filters label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    color: #444;
+  }
+  
+  .file-filters input,
+  .file-filters select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .file-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .file-table th,
+  .file-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .file-table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  .file-table td img {
+    max-width: 100px;
+    height: auto;
+  }
+  
+  .file-table .actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .file-table button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .file-table button:hover {
+    background-color: #218838;
+  }
+  
+  .file-table button.delete {
+    background-color: #dc3545;
+  }
+  
+  .file-table button.delete:hover {
+    background-color: #c82333;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    margin-top: 10px;
+  }
+  
