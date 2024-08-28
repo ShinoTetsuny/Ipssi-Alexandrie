@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { getToken, getUserId } from '../security/AuthService'; // Assurez-vous d'avoir getToken
+import FileUpload from '../components/FileUpload';
+import FileList from '../components/FileList';
 
 const Home = () => {
     const [user, setUser] = useState(null);
+    const handleUploadSuccess = (file) => {
+        console.log('File uploaded successfully:', file);
+        // Perform additional actions, such as updating the file list or notifying the user
+      };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -40,6 +46,8 @@ const Home = () => {
                     <p>Nom: {user.name}</p>
                     <p>Email: {user.email}</p>
                     {/* Ajoutez plus d'informations sur l'utilisateur ici */}
+                    <FileUpload clientId={user._id} onUploadSuccess={handleUploadSuccess} />
+                    <FileList clientId={user._id} />
                 </div>
             ) : (
                 <h1>Loading...</h1>
