@@ -2,7 +2,7 @@ const multer = require('multer');
 const mongoose = require('mongoose');
 const File = require('../models/file');
 const { getGfsBucket } = require('../database/bdd');
-const { updateStockageLeft, isStorageAvailable } = require('./user');
+const { updateStockageLeft, isStorageAvailable } = require('../utils/storage');
 
 // Set up multer for file upload (using memory storage)
 const storage = multer.memoryStorage();
@@ -207,9 +207,6 @@ const deleteFilesFromClient = async (clientId) => {
         await File.findByIdAndDelete(file._id);
       }
   
-      // Update the user's storage space
-      await updateStockageLeft(clientId, -totalSize);
-  
       console.log(`All files for client ${clientId} deleted successfully`);
       return { success: true, message: `All files for client ${clientId} deleted successfully` };
     } catch (error) {
@@ -217,6 +214,39 @@ const deleteFilesFromClient = async (clientId) => {
       return { success: false, message: 'Failed to delete files for client' };
     }
   };
+
+  const getStats = async (req, res) => {
+    try {
+        // Nombre total de fichiers
+        const totalFiles = await File.countDocuments();
+
+        // Nombre de fichiers uploadés aujourd'hui
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Rendre le début de la journée
+        const filesUploadedToday = await File.countDocuments({
+            createdAt: { $gte: today } // Filtre pour les fichiers uploadés à partir du début de la journée
+        });
+
+        // Répartition des fichiers par client
+        const filesPerClient = await File.aggregate([
+            {
+                $group: {
+                    _id: "$client",
+                    count: { $sum: 1 } // Compte le nombre de fichiers par client
+                }
+            }
+        ]);
+      
+        res.status(200).json({
+            totalFiles,
+            filesUploadedToday,
+            filesPerClient
+        });
+    } catch (error) {
+        console.error('Error retrieving statistics:', error);
+        res.status(500).json({ error: 'Failed to retrieve statistics' });
+    }
+};
 
 module.exports = {
     upload,
@@ -227,4 +257,5 @@ module.exports = {
     updateFile,
     deleteFile,
     deleteFilesFromClient,
+    getStats,
 };

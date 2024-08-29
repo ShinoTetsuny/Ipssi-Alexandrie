@@ -44,7 +44,6 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
           method: 'GET',
           headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
           }
         });
         const data = await response.json();
@@ -132,6 +131,7 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
     formData.append('client', clientId);
     formData.append('file', file);
     console.log(formData);
+    console.log(token);
 
     try {
       const response = await fetch('http://localhost:3000/files/upload', {
@@ -139,7 +139,6 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
         body: formData,
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
       }
       });
 
@@ -163,7 +162,6 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
       }
       });
 
@@ -195,7 +193,6 @@ const FileList = ({ onDeleteSuccess, onUploadSuccess, clientId, page = 'ADMIN' }
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
       }
       });
 

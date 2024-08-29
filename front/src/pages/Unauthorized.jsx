@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { getToken } from '../security/AuthService';
+import { useNavigate } from 'react-router-dom';
 
 const Unauthorized = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = getToken(); 
+
+        const timer = setTimeout(() => {
+            if (token) {
+                navigate('/home'); 
+            } else {
+                navigate('/'); 
+            }
+        }, 5000); 
+
+        return () => clearTimeout(timer);
+    }, [navigate]);
+    
     return (
         <div style={styles.unauthorizedContainer}>
-            <h1 style={styles.rotatingText}>404</h1>
+            <h1>404</h1>
         </div>
     );
 };
@@ -14,11 +32,6 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-    },
-
-    rotatingText: {
-        fontSize: '10rem',
-        animation: 'rotate 2s infinite linear',
     },
 };
 

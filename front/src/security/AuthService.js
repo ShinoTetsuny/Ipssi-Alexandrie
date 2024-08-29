@@ -33,10 +33,16 @@ export const hasRole = (roles) => {
     const token = getToken();
     if (!token) return false;
 
+    // Si `roles` n'est pas un tableau, le convertir en tableau
+    if (!Array.isArray(roles)) {
+        roles = [roles];
+    }
+
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
-        if (decoded && decoded.roles) {
-            return roles.some(role => decoded.roles.includes(role));
+        // Vérifie la propriété 'role' et non 'roles'
+        if (decoded && decoded.role) {
+            return roles.some(role => decoded.role.includes(role));
         }
         return false;
     } catch (error) {
@@ -44,6 +50,7 @@ export const hasRole = (roles) => {
         return false;
     }
 };
+
 
 export const getUserId = () => {
     const token = getToken();

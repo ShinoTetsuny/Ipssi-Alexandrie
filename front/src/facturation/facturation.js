@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 
 export async function generateInvoiceAndUpload(clientName, clientSurname, clientAddress, clientId) {
     const doc = new jsPDF();
-
+    console.log("Generating invoice for:", clientName, clientSurname, clientAddress, clientId);
     // Business Information
     const businessName = "Alexandrie";
     const businessAddress = "Immeuble Le Sésame, 8 Rue Germain Soufflot, 78180 Montigny-le-Bretonneux";
@@ -47,14 +47,16 @@ export async function generateInvoiceAndUpload(clientName, clientSurname, client
     // Generate PDF Blob
     const pdfBlob = doc.output("blob");
 
+    const formattedDate = getFormattedDate();
+
     // Create FormData for file upload
     const formData = new FormData();
-    formData.append("file", pdfBlob, `invoice_${clientSurname}.pdf`);
+    formData.append("file", pdfBlob, `invoice_${clientSurname}_${formattedDate}.pdf`);
     formData.append("client", clientId); // Attach the client ID to the upload
     console.log(formData);
 
     try {
-        const response = await fetch("http://localhost:3000/files/upload", {
+        const response = await fetch("http://localhost:3000/files/facturation", {
             method: "POST",
             body: formData,
         });
@@ -68,4 +70,16 @@ export async function generateInvoiceAndUpload(clientName, clientSurname, client
     } catch (error) {
         console.error("Error uploading file:", error);
     }
+}
+
+function getFormattedDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }

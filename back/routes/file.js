@@ -6,13 +6,20 @@ const {
   getFileByClient, 
   getAllFiles, 
   updateFile, 
-  deleteFile 
+  deleteFile,
+  getStats
 } = require('../controllers/file');
 
 const router = express.Router();
 
+// File upload for facturation
+router.post('/facturation', upload.single('file'), uploadFile);
+
 // File upload
 router.post('/upload', upload.single('file'), uploadFile);
+
+// Get stats
+router.get('/stats', getStats)
 
 // Get all files
 router.get('/', getAllFiles);
@@ -27,6 +34,6 @@ router.get('/client/:client', getFileByClient);
 router.put('/:id', upload.single('file'), updateFile);
 
 // Delete file
-router.delete('/:id', deleteFile);
+router.delete('/:id',deleteFile);
 
 module.exports = router;
