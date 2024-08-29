@@ -4,10 +4,12 @@ import FileList from '../components/FileList';
 import Storage from '../components/Storage';
 import PaymentModal from '../components/PaymentModal';
 import '../styles/Home.css';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
     const [user, setUser] = useState(null);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const navigate = useNavigate();
 
     const handleUploadSuccess = (file) => {
         console.log('File uploaded successfully:', file);
@@ -47,7 +49,7 @@ const Home = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        window.location.href = '/';
+        navigate('/')
     };
 
     const handleBuyStorage = () => {
