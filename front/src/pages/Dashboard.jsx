@@ -63,8 +63,6 @@ const DashBoard = () => {
         <div className="home-container">
             {users ? (
                 <div>
-                    <UserTable users={users} />
-                    <FileList clientId={""} onUploadSuccess={""} onDeleteSuccess={""} page='ADMIN' />
                     {stats && (
                         <div className="stats-container">
                             <h3 className="stats-title">Dashboard Statistics</h3>
@@ -82,6 +80,8 @@ const DashBoard = () => {
                             </div>
                         </div>
                     )}
+                    <UserTable users={users} />
+                    <FileList clientId={""} onUploadSuccess={""} onDeleteSuccess={""} page='ADMIN' />
                 </div>
             ) : (
                 <h1>Loading...</h1>

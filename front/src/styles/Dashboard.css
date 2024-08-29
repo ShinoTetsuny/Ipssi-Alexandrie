@@ -1,31 +1,28 @@
-.home-container {
+.stats-container {
     padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.stats-title {
     margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
 }
 
-.header-buttons button {
-    margin-left: 10px;
+.stats-details {
+    color: #444;
 }
 
-.user-info, .storage-info {
-    margin-bottom: 20px;
+.stats-list {
+    margin-top: 10px;
+    padding-left: 20px;
 }
 
-.delete-account {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    margin-bottom: 20px;
+.stats-list li {
+    margin-bottom: 5px;
+    font-size: 16px;
 }
-
-
